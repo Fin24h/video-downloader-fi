@@ -1,6 +1,6 @@
-project('video-downloader',  
-  version: '0.10.10',
-  meson_version: '>= 0.59.0',
+project('video-downloader',
+  version: '0.12.7',
+  meson_version: '>= 0.62.0',
   default_options: ['warning_level=2', 'werror=false'],
 )
 
@@ -34,6 +34,6 @@ gnome.post_install(
 
 if (python_for_linting.found() and python_sources_for_linting.length() > 0)
   test('Lint python sources', python_for_linting,
-    args: ['-m', 'flake8', python_sources_for_linting]
+    args: ['-m', 'flake8', python_sources_for_linting],
   )
 endif

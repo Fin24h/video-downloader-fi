@@ -16,28 +16,37 @@
 # along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
-import locale
-import os
-import subprocess
+import traceback
 from collections import OrderedDict
 
-from gi.repository import GLib, GObject
+from gi.repository import Gio, GLib, GObject
+
+from video_downloader.util import g_log, gobject_log
 
 
 class Closable:
     def __init__(self):
-        self.closed = False
+        self.__closed = False
         self.__close_callbacks = []
 
+    @property
+    def closed(self):
+        return self.__closed
+
     def add_close_callback(self, callback, *args, **kwargs):
-        assert not self.closed, 'closed'
         self.__close_callbacks.append(
             functools.partial(callback, *args, **kwargs))
+        if self.closed:
+            self.close()
 
     def close(self):
-        self.closed = True
+        self.__closed = True
         while self.__close_callbacks:
-            self.__close_callbacks[-1]()
+            try:
+                self.__close_callbacks[-1]()
+            except Exception:
+                g_log(None, GLib.LogLevelFlags.LEVEL_CRITICAL,
+                      '%s', traceback.format_exc())
             del self.__close_callbacks[-1]
 
     def __del__(self):
@@ -57,7 +66,6 @@ class CloseStack(Closable):
         self.__key += 1
 
     def close(self):
-        self.closed = True
         while self.__closables:
             key = next(reversed(self.__closables))
             self.__closables[key].close()
@@ -71,7 +79,7 @@ class SignalConnection(Closable):
         def on_notify(*args):
             if no_args:
                 args = []
-            callback(*args, *extra_args)
+            return callback(*args, *extra_args)
         handler = obj.connect(signal_name, on_notify)
         self.add_close_callback(obj.disconnect, handler)
 
@@ -120,55 +128,10 @@ class PropertyBinding(Closable):
                 self.__frozen = False
 
 
-def expand_path(path):
-    parts = path.replace(os.altsep or os.sep, os.sep).split(os.sep)
-    home_dir = os.path.expanduser('~')
-    if parts[0] == '~':
-        parts[0] = home_dir
-    elif parts[0].startswith('xdg-'):
-        name = parts[0][len('xdg-'):].replace('-', '').upper()
-        try:
-            parts[0] = subprocess.check_output(
-                ['xdg-user-dir', name], universal_newlines=True,
-                stdin=subprocess.DEVNULL).splitlines()[0]
-        except FileNotFoundError:
-            parts[0] = home_dir
-    return os.path.normpath(os.path.join(os.sep, *parts))
-
-
-def gobject_log(obj, info=None):
-    DOMAIN = 'gobject-ref'
-    LEVEL = GLib.LogLevelFlags.LEVEL_DEBUG
-    name = repr(obj)
-    if info:
-        name += ' (' + str(info) + ')'
-    g_log(DOMAIN, LEVEL, 'Create %s', name)
-    obj.weak_ref(g_log, DOMAIN, LEVEL, 'Destroy %s', name)
-    return obj
-
-
-def g_log(domain, log_level, format_string, *args):
-    fields = GLib.Variant('a{sv}', {
-        'MESSAGE': GLib.Variant('s', format_string % args)})
-    GLib.log_variant(domain, log_level, fields)
-
-
-def languages_from_locale():
-    locale_languages = []
-    for envar in ['LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG']:
-        val = os.environ.get(envar)
-        if val:
-            locale_languages.extend(val.split(':'))
-            break
-    if 'C' not in locale_languages:
-        locale_languages.append('C')
-    languages = []
-    for lang in locale_languages:
-        lang = locale.normalize(lang)
-        for sep in ['@', '.', '_']:
-            lang = lang.split(sep, maxsplit=1)[0]
-        if lang == 'C':
-            lang = 'en'
-        if lang not in languages:
-            languages.append(lang)
-    return languages
+def create_action(action_group, closable, name, callback, *extra_args,
+                  parameter_type=None, no_args=False):
+    action = gobject_log(Gio.SimpleAction.new(name, parameter_type), name)
+    closable.push(SignalConnection(
+        action, 'activate', callback, *extra_args, no_args=no_args))
+    action_group.add_action(action)
+    closable.add_close_callback(action_group.remove_action, name)

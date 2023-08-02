@@ -15,27 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
 
-import fcntl
-import functools
-import json
 import os
 import signal
 import sys
 
-
-class Handler:
-    def __init__(self, input_file, output_file):
-        self._in = input_file
-        self._out = output_file
-
-    def _rpc(self, name, *args):
-        print(json.dumps({'method': name, 'args': args}),
-              file=self._out, flush=True)
-        answer = json.loads(self._in.readline())
-        return answer['result']
-
-    def __getattr__(self, name):
-        return functools.partial(self._rpc, name)
+from video_downloader.util.rpc import RpcClient
 
 
 if __name__ == '__main__':
@@ -48,13 +32,13 @@ if __name__ == '__main__':
     output_file = os.fdopen(os.dup(sys.stdout.fileno()), 'w', closefd=False)
     # Prevent leaking the fds to children that might remain after this process
     # exits
-    fcntl.fcntl(input_file, fcntl.F_SETFL, os.O_CLOEXEC)
-    fcntl.fcntl(output_file, fcntl.F_SETFL, os.O_CLOEXEC)
+    os.set_inheritable(input_file.fileno(), False)
+    os.set_inheritable(output_file.fileno(), False)
     # Redirect stdin and stdout to /dev/null to prevent interferences
     with open(os.devnull, 'r+') as devnull:
-        os.dup2(devnull.fileno(), sys.stdin.fileno())
-        os.dup2(devnull.fileno(), sys.stdout.fileno())
-    handler = Handler(input_file, output_file)
+        os.dup2(devnull.fileno(), sys.stdin.fileno(), inheritable=True)
+        os.dup2(devnull.fileno(), sys.stdout.fileno(), inheritable=True)
+    handler = RpcClient(output_file, input_file)
     try:
         from video_downloader.downloader.yt_dlp_monkey_patch import (
             install_monkey_patches)

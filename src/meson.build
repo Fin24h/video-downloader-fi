@@ -52,7 +52,8 @@ video_downloader_bin = configure_file(
   output: 'video-downloader',
   configuration: conf,
   install: true,
-  install_dir: get_option('bindir')
+  install_dir: get_option('bindir'),
+  install_mode: 'r-xr-xr-x',
 )
 python_sources_for_linting += video_downloader_bin
 
@@ -64,8 +65,7 @@ video_downloader_sources = files([
   'model.py',
   'playlist_dialog.py',
   'shortcuts_dialog.py',
-  'util.py',
-  'window.py'
+  'window.py',
 ])
 python_sources_for_linting += video_downloader_sources
 
@@ -73,3 +73,4 @@ install_data(video_downloader_sources, install_dir: moduledir)
 
 
 subdir('downloader')
+subdir('util')

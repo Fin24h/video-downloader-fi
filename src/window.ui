@@ -21,6 +21,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
   <requires lib="gtk" version="4.0"/>
   <requires lib="libadwaita" version="1.0"/>
   <object class="GtkTextBuffer" id="error_buffer">
+    <property name="enable-undo">False</property>
     <property name="text">Error XXX</property>
   </object>
   <menu id="hamburger_menu">
@@ -32,6 +33,10 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
       </item>
     </section>
     <section>
+      <item>
+        <attribute name="label" translatable="yes">Change Download Location</attribute>
+        <attribute name="action">win.change-download-folder</attribute>
+      </item>
       <item>
         <attribute name="label" translatable="yes">Keyboard Shortcuts</attribute>
         <attribute name="action">win.shortcuts</attribute>
@@ -46,9 +51,9 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
     <property name="menu-model">hamburger_menu</property>
   </object>
   <template class="VideoDownloaderWindow" parent="AdwApplicationWindow">
-    <property name="title" translatable="1">Video Downloader</property>
+    <property name="title" translatable="yes">Video Downloader</property>
     <property name="default-width">600</property>
-    <child>
+    <property name="content">
       <object class="GtkStack" id="main_stack_wdg">
         <property name="transition-type">slide-left-right</property>
         <child>
@@ -57,6 +62,25 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
             <property name="child">
               <object class="GtkBox" id="audio_video_page">
                 <property name="orientation">vertical</property>
+                <child>
+                  <object class='GtkShortcutController'>
+                    <property name='scope'>managed</property>
+                    <child>
+                      <object class='GtkShortcut'>
+                        <property name='trigger'>&lt;Alt&gt;A</property>
+                        <property name='action'>action(win.set-audio-video-page)</property>
+                        <property name="arguments">'audio'</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class='GtkShortcut'>
+                        <property name='trigger'>&lt;Alt&gt;V</property>
+                        <property name='action'>action(win.set-audio-video-page)</property>
+                        <property name="arguments">'video'</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
                 <child>
                   <object class="AdwHeaderBar">
                     <property name="centering-policy">strict</property>
@@ -68,6 +92,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                     </child>
                     <child type="end">
                       <object class="GtkMenuButton">
+                        <property name="tooltip-text" translatable="yes">Main Menu</property>
                         <property name="popover">hamburger_popover_menu</property>
                         <property name="direction">none</property>
                         <property name="primary">True</property>
@@ -81,7 +106,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                     <child>
                       <object class="AdwViewStackPage">
                         <property name="name">audio</property>
-                        <property name="title" translatable="1">Audio</property>
+                        <property name="title" translatable="yes">Audio</property>
                         <property name="icon-name">audio-x-generic-symbolic</property>
                         <property name="child">
                           <object class="AdwClamp" id="audio_page">
@@ -103,7 +128,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                                     <property name="selection-mode">none</property>
                                     <child>
                                       <object class="AdwEntryRow" id="audio_url_wdg">
-                                        <property name="title" translatable="1">URL</property>
+                                        <property name="title" translatable="yes">URL</property>
                                         <property name="activates-default">1</property>
                                         <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NO_EMOJI | GTK_INPUT_HINT_NONE</property>
                                         <property name="input-purpose">url</property>
@@ -113,7 +138,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                                 </child>
                                 <child>
                                   <object class="GtkButton" id="audio_download_wdg">
-                                    <property name="label" translatable="1">Download</property>
+                                    <property name="label" translatable="yes">Download</property>
                                     <property name="receives-default">1</property>
                                     <property name="halign">center</property>
                                     <property name="action-name">win.download</property>
@@ -132,7 +157,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                     <child>
                       <object class="AdwViewStackPage">
                         <property name="name">video</property>
-                        <property name="title" translatable="1">Video</property>
+                        <property name="title" translatable="yes">Video</property>
                         <property name="icon-name">video-x-generic-symbolic</property>
                         <property name="child">
                           <object class="AdwClamp" id="video_page">
@@ -154,7 +179,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                                     <property name="selection-mode">none</property>
                                     <child>
                                       <object class="AdwEntryRow" id="video_url_wdg">
-                                        <property name="title" translatable="1">URL</property>
+                                        <property name="title" translatable="yes">URL</property>
                                         <property name="activates-default">1</property>
                                         <property name="input-hints">GTK_INPUT_HINT_NO_SPELLCHECK | GTK_INPUT_HINT_NO_EMOJI | GTK_INPUT_HINT_NONE</property>
                                         <property name="input-purpose">url</property>
@@ -162,17 +187,28 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                                     </child>
                                     <child>
                                       <object class="AdwComboRow" id="resolution_wdg">
-                                        <property name="title" translatable="1">Resolution</property>
+                                        <property name="title" translatable="yes">Resolution</property>
                                         <property name="model">
                                           <object class="GtkStringList"/>
                                         </property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="AdwActionRow">
+                                        <property name="title" translatable="yes">Prefer MPEG format</property>
+                                        <property name="activatable-widget">prefer_mpeg_wdg</property>
+                                        <child>
+                                          <object class="GtkSwitch" id="prefer_mpeg_wdg">
+                                            <property name="valign">center</property>
+                                          </object>
+                                        </child>
                                       </object>
                                     </child>
                                   </object>
                                 </child>
                                 <child>
                                   <object class="GtkButton" id="video_download_wdg">
-                                    <property name="label" translatable="1">Download</property>
+                                    <property name="label" translatable="yes">Download</property>
                                     <property name="receives-default">1</property>
                                     <property name="halign">center</property>
                                     <property name="action-name">win.download</property>
@@ -210,7 +246,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                   <object class="AdwHeaderBar">
                     <child>
                       <object class="GtkButton" id="download_cancel_wdg">
-                        <property name="label" translatable="1">Cancel</property>
+                        <property name="label" translatable="yes">Cancel</property>
                         <property name="action-name">win.cancel</property>
                       </object>
                     </child>
@@ -301,6 +337,18 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                     <child>
                       <object class="GtkButton" id="error_back_wdg">
                         <property name="action-name">win.back</property>
+                        <property name="tooltip-text" translatable="yes">Back</property>
+                        <child>
+                          <object class='GtkShortcutController'>
+                            <property name='scope'>managed</property>
+                            <child>
+                              <object class='GtkShortcut'>
+                                <property name='trigger'>&lt;Alt&gt;Left</property>
+                                <property name='action'>activate</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                         <child>
                           <object class="GtkImage">
                             <property name="icon-name">go-previous-symbolic</property>
@@ -308,7 +356,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                           </object>
                         </child>
                         <accessibility>
-                          <property name="label" translatable="1">Back</property>
+                          <property name="label" translatable="yes">Back</property>
                         </accessibility>
                         <style>
                           <class name="image-button"/>
@@ -337,7 +385,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="label" translatable="1">Download failed</property>
+                            <property name="label" translatable="yes">Download failed</property>
                             <attributes>
                               <attribute name="weight" value="bold"></attribute>
                               <attribute name="scale" value="1.125"></attribute>
@@ -356,7 +404,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                                 </child>
                                 <child type="label">
                                   <object class="GtkLabel">
-                                    <property name="label" translatable="1">Details</property>
+                                    <property name="label" translatable="yes">Details</property>
                                   </object>
                                 </child>
                                 <accessibility>
@@ -378,6 +426,10 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                                         <property name="editable">0</property>
                                         <property name="wrap-mode">word-char</property>
                                         <property name="buffer">error_buffer</property>
+                                        <property name="bottom-margin">6</property>
+                                        <property name="left-margin">6</property>
+                                        <property name="right-margin">6</property>
+                                        <property name="top-margin">6</property>
                                       </object>
                                     </property>
                                   </object>
@@ -405,6 +457,18 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                     <child>
                       <object class="GtkButton" id="success_back_wdg">
                         <property name="action-name">win.back</property>
+                        <property name="tooltip-text" translatable="yes">Back</property>
+                        <child>
+                          <object class='GtkShortcutController'>
+                            <property name='scope'>managed</property>
+                            <child>
+                              <object class='GtkShortcut'>
+                                <property name='trigger'>&lt;Alt&gt;Left</property>
+                                <property name='action'>activate</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                         <child>
                           <object class="GtkImage">
                             <property name="icon-name">go-previous-symbolic</property>
@@ -412,7 +476,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                           </object>
                         </child>
                         <accessibility>
-                          <property name="label" translatable="1">Back</property>
+                          <property name="label" translatable="yes">Back</property>
                         </accessibility>
                         <style>
                           <class name="image-button"/>
@@ -423,7 +487,6 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                 </child>
                 <child>
                   <object class="AdwClamp">
-                    <property name="valign">center</property>
                     <property name="vexpand">True</property>
                     <child>
                       <object class="GtkBox">
@@ -442,7 +505,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="label" translatable="1">Download finished</property>
+                            <property name="label" translatable="yes">Download finished</property>
                             <attributes>
                               <attribute name="weight" value="bold"></attribute>
                               <attribute name="scale" value="1.125"></attribute>
@@ -451,9 +514,55 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
                         </child>
                         <child>
                           <object class="GtkButton" id="finished_download_dir_wdg">
-                            <property name="label" translatable="1">Open Download Location</property>
+                            <property name="label" translatable="yes">Open Download Location</property>
                             <property name="halign">center</property>
                             <property name="action-name">win.open-finished-download-dir</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="vexpand">1</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">8</property>
+                            <child>
+                              <object class="GtkExpander" id="success_details_expander_wdg">
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child type="label">
+                                  <object class="GtkLabel">
+                                    <property name="label" translatable="yes">Details</property>
+                                  </object>
+                                </child>
+                                <accessibility>
+                                  <relation name="owns">success_details_revealer_wdg</relation>
+                                </accessibility>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkRevealer" id="success_details_revealer_wdg">
+                                <property name="vexpand">1</property>
+                                <property name="transition-type">crossfade</property>
+                                <property name="reveal-child" bind-source="success_details_expander_wdg" bind-property="expanded" bind-flags="sync-create"/>
+                                <property name="child">
+                                  <object class="GtkScrolledWindow">
+                                    <property name="hscrollbar-policy">never</property>
+                                    <property name="has-frame">True</property>
+                                    <property name="child">
+                                      <object class="GtkTextView" id="success_details_view_wdg">
+                                        <property name="editable">0</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <property name="bottom-margin">0</property>
+                                        <property name="left-margin">6</property>
+                                        <property name="right-margin">6</property>
+                                        <property name="top-margin">6</property>
+                                        <property name="pixels-below-lines">6</property>
+                                      </object>
+                                    </property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -465,7 +574,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
           </object>
         </child>
       </object>
-    </child>
+    </property>
     <child>
       <object class="GtkShortcutController">
         <property name="scope">global</property>

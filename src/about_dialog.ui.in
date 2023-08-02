@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (C) 2020-2022 Unrud <unrud@outlook.com>
+<!-- Copyright (C) 2020-2023 Unrud <unrud@outlook.com>
 
 This file is part of Video Downloader.
 
@@ -24,7 +24,7 @@ along with Video Downloader.  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy-with-parent">1</property>
     <!-- Main page -->
     <property name="application-icon">com.github.unrud.VideoDownloader</property>
-    <property name="application-name" translatable="1">Video Downloader</property>
+    <property name="application-name" translatable="yes">Video Downloader</property>
     <property name="developer-name">Unrud</property>
     <property name="version">@VERSION@</property>
     <!-- What's new -->
@@ -43,26 +43,47 @@ Artem Polishchuk
 Óscar Fernández Díaz</property>
     <property name="artists">Tobias Bernard</property>
     <property name="translator-credits">Åke Engelbrektson
-albanobattistella
+Albano Battistella
 Ali Khomami P.
-Gustavo Peredo
+Allan Nordhøy
+Christian Elbrianno
+Dan
+gallegonovato
+Gustavo Machado Peredo
 Heimen Stoffels
-Ícar
-MartinIIOT
-milotype
+Ícar N. S.
+Ihor Hordiichuk
+Irénée THIRION
+J. Lavoie
+Lee Junseo
+Luna Jernberg
+L.Yang
+MartinIIoT
+mere
+Milo Ivir
+Oğuz Ersen
 Óscar Fernández Díaz
 ovari
+P. A.
+Peter Dave Hello
+Philip Goto
 Rafael Mardojai CM
-rene-coty
+Reza Almanda
+Roger VC
 Roy Meissner
+Ryo Nakano
 Sabri Ünal
-sicklylife.jp
+sicklylife
+SPiRiT 
 Thorfin89
+Troja
 Umidjon Almasov
 Ümit Solmaz
+Valeriy Manzhos
+vikdevelop
 Vojtěch Perník</property>
     <!-- Legal -->
-    <property name="copyright">Copyright © 2019-2022 Unrud</property>
+    <property name="copyright">Copyright © 2019-2023 Unrud</property>
     <property name="license-type">gpl-3-0</property>
   </object>
 </interface>

@@ -1,107 +1,106 @@
-# Turkish translations for video-downloader package.
-# Copyright (C) 2020-2022 video-downloader'S COPYRIGHT HOLDER
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the video-downloader package.
-# ÜSolmaz <u2slmz@protonmail.com>, 2021.
-# Sabri Ünal <libreajans@gmail.com>, 2022.
-# Oğuz Ersen <oguz@ersen.moe>, 2023.
+# Christian Elbrianno <crse@protonmail.ch>, 2023.
+# Reza Almanda <rezaalmanda27@gmail.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: video-downloader\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-25 16:29+0200\n"
-"PO-Revision-Date: 2023-02-28 13:46+0000\n"
-"Last-Translator: Oğuz Ersen <oguz@ersen.moe>\n"
-"Language-Team: Turkish <https://hosted.weblate.org/projects/video-downloader/"
-"gui/tr/>\n"
-"Language: tr\n"
+"PO-Revision-Date: 2023-05-25 19:52+0000\n"
+"Last-Translator: Christian Elbrianno <crse@protonmail.ch>\n"
+"Language-Team: Indonesian <https://hosted.weblate.org/projects/video-"
+"downloader/gui/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.16-rc\n"
-"X-Project-Style: gnome\n"
+"X-Generator: Weblate 4.18-dev\n"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:7
 #: data/com.github.unrud.VideoDownloader.desktop.in:3 src/about_dialog.ui.in:27
 #: src/main.py:39 src/window.ui:54
 msgid "Video Downloader"
-msgstr "Video İndirici"
+msgstr "Pengunduh Video"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:8
 #: data/com.github.unrud.VideoDownloader.desktop.in:4
 msgid "Download videos from websites like YouTube and many others"
-msgstr "YouTube ve diğer internet sitelerinden video indirin"
+msgstr "Unduh video dari situs web seperti YouTube dan lainnya"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:10
 msgid ""
 "Download videos from websites with an easy-to-use interface. Provides the "
 "following features:"
 msgstr ""
-"Kullanımı kolay bir arayüz ile web sitelerinden video indirin. Aşağıdaki "
-"özellikleri sağlar:"
+"Unduh video dari situs web dengan antarmuka yang mudah digunakan. "
+"Menyediakan fitur berikut:"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:15
 msgid "Convert videos to MP3"
-msgstr "Videoları MP3'e dönüştür"
+msgstr "Konversi video ke MP3"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:16
 msgid "Supports password-protected and private videos"
-msgstr "Parola korumalı ve özel videoları destekler"
+msgstr "Mendukung video yang dilindungi kata sandi dan video pribadi"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:17
 msgid "Download single videos or whole playlists"
-msgstr "Tek videoları veya tüm çalma listelerini indirin"
+msgstr "Unduh satu video atau seluruh daftar putar"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:18
 msgid "Automatically selects a video format based on your quality demands"
-msgstr "Kalite taleplerinize göre kendiliğinden video biçimi seçer"
+msgstr ""
+"Secara otomatis memilih format video berdasarkan kualitas yg anda pilih"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:20
 msgid "Based on yt-dlp."
-msgstr "yt-dlp temelli."
+msgstr "Berdasarkan yt-dlp."
 
 #: data/com.github.unrud.VideoDownloader.desktop.in:14
 #: src/shortcuts_dialog.ui:39 src/window.ui:30
 msgid "New Window"
-msgstr "Yeni Pencere"
+msgstr "Jendela Baru"
 
 #: src/authentication_dialog.py:30
 msgid "Authentication Required"
-msgstr "Kimlik Doğrulaması Gerekli"
+msgstr "Otentikasi diperlukan"
 
 #: src/authentication_dialog.py:34 src/window.ui:249
 msgid "Cancel"
-msgstr "İptal Et"
+msgstr "Batal"
 
 #: src/authentication_dialog.py:46
 msgid "Sign in"
-msgstr "Oturum aç"
+msgstr "Masuk"
 
 #: src/authentication_dialog.py:46
 msgid "Skip"
-msgstr "Atla"
+msgstr "Lewati"
 
 #: src/authentication_dialog_login.ui:31
 #: src/authentication_dialog_password.ui:31
 msgid "The video is not public."
-msgstr "Video herkese açık değil."
+msgstr "Video ini tidak untuk umum."
 
 #: src/authentication_dialog_login.ui:44
 msgid "Username"
-msgstr "Kullanıcı adı"
+msgstr "Nama pengguna"
 
 #: src/authentication_dialog_login.ui:70
 #: src/authentication_dialog_password.ui:40
 msgid "Password"
-msgstr "Parola"
+msgstr "Kata sandi"
 
 #: src/main.py:38
 msgid "Prefill URL field"
-msgstr "URL alanını önceden doldur"
+msgstr "Bidang URL yang sudah diisi sebelumnya"
 
 #: src/model.py:66
 msgid "Best"
-msgstr "En iyi"
+msgstr "Terbaik"
 
 #: src/model.py:67
 msgid "4320p (8K)"
@@ -141,119 +140,119 @@ msgstr "144p"
 
 #: src/model.py:157
 msgid "Invalid download folder"
-msgstr "Geçersiz indirme klasörü"
+msgstr "Folder unduhan tidak valid"
 
 #: src/model.py:277 src/model.py:283 src/window.py:434
 msgid "Not a directory"
-msgstr "Dizin değil"
+msgstr "Bukan sebuah direktori"
 
 #: src/model.py:281 src/model.py:286
 msgid "Permission denied"
-msgstr "İzin reddedildi"
+msgstr "Izin ditolak"
 
 #: src/playlist_dialog.py:29
 msgid "Download Playlist?"
-msgstr "Çalma Listesi İndirilsin Mi?"
+msgstr "Unduh Daftar Putar?"
 
 #: src/playlist_dialog.py:30
 msgid "The video is part of a playlist."
-msgstr "Video bir çalma listesinin parçası."
+msgstr "Video ini merupakan bagian dari daftar putar."
 
 #: src/playlist_dialog.py:32
 msgid "Single Video"
-msgstr "Tek Video"
+msgstr "Video Tunggal"
 
 #: src/playlist_dialog.py:33
 msgid "All Videos in Playlist"
-msgstr "Çalma Listesindeki Tüm Videolar"
+msgstr "Semua Video dalam Daftar Putar"
 
 #: src/shortcuts_dialog.ui:29
 msgid "General"
-msgstr "Genel"
+msgstr "Umum"
 
 #: src/shortcuts_dialog.ui:33
 msgid "Open Menu"
-msgstr "Menüyü Aç"
+msgstr "Buka Menu"
 
 #: src/shortcuts_dialog.ui:45
 msgid "Close Window"
-msgstr "Pencereyi Kapat"
+msgstr "Tutup Jendela"
 
 #: src/shortcuts_dialog.ui:51
 msgid "Quit"
-msgstr "Çıkış"
+msgstr "Keluar"
 
 #: src/shortcuts_dialog.ui:57 src/window.ui:41
 msgid "Keyboard Shortcuts"
-msgstr "Klavye Kısayolları"
+msgstr "Pintasan Papan Tik"
 
 #: src/shortcuts_dialog.ui:64
 msgid "Navigation"
-msgstr "Gezinme"
+msgstr "Navigasi"
 
 #: src/shortcuts_dialog.ui:68
 msgid "Go back"
-msgstr "Geri git"
+msgstr "Kembali"
 
 #: src/shortcuts_dialog.ui:74
 msgid "Switch to Audio"
-msgstr "Sese Geç"
+msgstr "Ganti ke Audio"
 
 #: src/shortcuts_dialog.ui:80
 msgid "Switch to Video"
-msgstr "Videoya Geç"
+msgstr "Ganti ke Video"
 
 #: src/window.py:263
 msgid "Downloading"
-msgstr "İndiriliyor"
+msgstr "Mengunduh"
 
 #: src/window.py:265 src/window.py:288
 msgid "{} of {}"
-msgstr "{} / {}"
+msgstr "{} dari {}"
 
 #: src/window.py:289 src/window.py:291
 msgid "unknown"
-msgstr "bilinmeyen"
+msgstr "tidak diketahui"
 
 #: src/window.py:359 src/window.ui:388
 msgid "Download failed"
-msgstr "İndirme başarısız oldu"
+msgstr "Unduhan gagal"
 
 #: src/window.py:363 src/window.ui:508
 msgid "Download finished"
-msgstr "İndirme tamamlandı"
+msgstr "Unduhan selesai"
 
 #: src/window.py:367 src/window.ui:517
 msgid "Open Download Location"
-msgstr "İndirme Konumunu Aç"
+msgstr "Buka Lokasi Unduhan"
 
 #: src/window.py:405
 msgid "Reset to Default"
-msgstr "Öntanımlı Değere Sıfırla"
+msgstr "Atur Ulang ke Asal"
 
 #: src/window.py:406 src/window.py:439 src/window.ui:37
 msgid "Change Download Location"
-msgstr "İndirme Konumunu Değiştir"
+msgstr "Ganti Lokasi Unduhan"
 
 #: src/window.py:436
 msgid "Invalid folder selected"
-msgstr "Geçersiz klasör seçildi"
+msgstr "Folder terpilih tidak valid"
 
 #: src/window.py:440
 msgid "Select Folder"
-msgstr "Klasör Seç"
+msgstr "Pilih Folder"
 
 #: src/window.ui:45
 msgid "About Video Downloader"
-msgstr "Video İndirici Hakkında"
+msgstr "Tentang Video Downloader"
 
 #: src/window.ui:95
 msgid "Main Menu"
-msgstr "Ana Menü"
+msgstr "Menu Utama"
 
 #: src/window.ui:109
 msgid "Audio"
-msgstr "Ses"
+msgstr "Audio"
 
 #: src/window.ui:131 src/window.ui:182
 msgid "URL"
@@ -261,7 +260,7 @@ msgstr "URL"
 
 #: src/window.ui:141 src/window.ui:211
 msgid "Download"
-msgstr "İndir"
+msgstr "Unduh"
 
 #: src/window.ui:160
 msgid "Video"
@@ -269,16 +268,16 @@ msgstr "Video"
 
 #: src/window.ui:190
 msgid "Resolution"
-msgstr "Çözünürlük"
+msgstr "Resolusi"
 
 #: src/window.ui:198
 msgid "Prefer MPEG format"
-msgstr "MPEG biçimini tercih et"
+msgstr "Lebih suka format MPEG"
 
 #: src/window.ui:340 src/window.ui:359 src/window.ui:460 src/window.ui:479
 msgid "Back"
-msgstr "Geri"
+msgstr "Kembali"
 
 #: src/window.ui:407 src/window.ui:534
 msgid "Details"
-msgstr "Ayrıntılar"
+msgstr "Detail"

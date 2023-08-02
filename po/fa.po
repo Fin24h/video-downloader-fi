@@ -2,30 +2,31 @@
 # Copyright (C) 2020 THE video-downloader'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the video-downloader package.
 # Ali Khomami P. <alikhomami888@gmail.com>, 2020.
-#
+# "P. A." <thekhanxp@gmail.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: video-downloader\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-18 21:51+0200\n"
-"PO-Revision-Date: 2021-02-05 05:25+0100\n"
-"Last-Translator: Ali Khomami P. <alikhomami888@gmail.com>\n"
-"Language-Team: Persian\n"
+"POT-Creation-Date: 2023-06-25 16:29+0200\n"
+"PO-Revision-Date: 2023-07-25 15:03+0000\n"
+"Last-Translator: \"P. A.\" <thekhanxp@gmail.com>\n"
+"Language-Team: Persian <https://hosted.weblate.org/projects/video-downloader/"
+"gui/fa/>\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.0-dev\n"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:7
-#: data/com.github.unrud.VideoDownloader.desktop.in:3 src/about_dialog.ui:25
-#: src/main.py:37 src/window.ui:55
+#: data/com.github.unrud.VideoDownloader.desktop.in:3 src/about_dialog.ui.in:27
+#: src/main.py:39 src/window.ui:54
 msgid "Video Downloader"
 msgstr "Video Downloader"
 
 #: data/com.github.unrud.VideoDownloader.metainfo.xml.in:8
-#: data/com.github.unrud.VideoDownloader.desktop.in:4 src/about_dialog.ui:28
+#: data/com.github.unrud.VideoDownloader.desktop.in:4
 msgid "Download videos from websites like YouTube and many others"
 msgstr "بارگیری ویدیو از سایت‌هایی مانند یوتیوب یا بسیاری از سایت‌های دیگر"
 
@@ -58,7 +59,7 @@ msgid "Based on yt-dlp."
 msgstr "بر پایهٔ برنامهٔ yt-dlp."
 
 #: data/com.github.unrud.VideoDownloader.desktop.in:14
-#: src/shortcuts_dialog.ui:39 src/window.ui:29
+#: src/shortcuts_dialog.ui:39 src/window.ui:30
 msgid "New Window"
 msgstr "پنجرهٔ جدید"
 
@@ -66,7 +67,7 @@ msgstr "پنجرهٔ جدید"
 msgid "Authentication Required"
 msgstr "راستی‌آزمایی لازم است"
 
-#: src/authentication_dialog.py:34 src/window.ui:297
+#: src/authentication_dialog.py:34 src/window.ui:249
 msgid "Cancel"
 msgstr "لغو"
 
@@ -79,7 +80,7 @@ msgid "Skip"
 msgstr "پرش"
 
 #: src/authentication_dialog_login.ui:31
-#: src/authentication_dialog_password.ui:13
+#: src/authentication_dialog_password.ui:31
 msgid "The video is not public."
 msgstr "این ویدیو عمومی نیست."
 
@@ -88,67 +89,79 @@ msgid "Username"
 msgstr "نام کاربری"
 
 #: src/authentication_dialog_login.ui:70
-#: src/authentication_dialog_password.ui:22
+#: src/authentication_dialog_password.ui:40
 msgid "Password"
 msgstr "گذرواژه"
 
-#: src/main.py:36
+#: src/main.py:38
 msgid "Prefill URL field"
 msgstr "کادرِ مربوط به نشانی اینترنتی را پر کنید"
 
-#: src/model.py:65
+#: src/model.py:66
 msgid "Best"
 msgstr "بهترین کیفیت"
 
-#: src/model.py:66
+#: src/model.py:67
 msgid "4320p (8K)"
 msgstr "4320p (8K)"
 
-#: src/model.py:67
+#: src/model.py:68
 msgid "2160p (4K)"
 msgstr "2160p (4K)"
 
-#: src/model.py:68
+#: src/model.py:69
 msgid "1440p (HD)"
 msgstr "1440p (HD)"
 
-#: src/model.py:69
+#: src/model.py:70
 msgid "1080p (HD)"
 msgstr "1080p (HD)"
 
-#: src/model.py:70
+#: src/model.py:71
 msgid "720p (HD)"
 msgstr "720p (HD)"
 
-#: src/model.py:71
+#: src/model.py:72
 msgid "480p"
 msgstr "480p"
 
-#: src/model.py:72
+#: src/model.py:73
 msgid "360p"
 msgstr "360p"
 
-#: src/model.py:73
+#: src/model.py:74
 msgid "240p"
 msgstr "240p"
 
-#: src/model.py:74
+#: src/model.py:75
 msgid "144p"
 msgstr "144p"
 
-#: src/playlist_dialog.py:31
+#: src/model.py:157
+msgid "Invalid download folder"
+msgstr "پوشه دانلود نامعتبر است"
+
+#: src/model.py:277 src/model.py:283 src/window.py:434
+msgid "Not a directory"
+msgstr "یک مسیر نیست"
+
+#: src/model.py:281 src/model.py:286
+msgid "Permission denied"
+msgstr "اجازه رد شد"
+
+#: src/playlist_dialog.py:29
 msgid "Download Playlist?"
 msgstr "همهٔ فهرست‌پخش را بارگیری می‌کنید؟"
 
-#: src/playlist_dialog.py:32
+#: src/playlist_dialog.py:30
 msgid "The video is part of a playlist."
 msgstr "این ویدیو بخشی از یک فهرست پخش است."
 
-#: src/playlist_dialog.py:34
+#: src/playlist_dialog.py:32
 msgid "Single Video"
 msgstr "تک ویدیو"
 
-#: src/playlist_dialog.py:35
+#: src/playlist_dialog.py:33
 msgid "All Videos in Playlist"
 msgstr "همهٔ ویدیوهای درون فهرست پخش"
 
@@ -168,62 +181,102 @@ msgstr "بستن پنجره"
 msgid "Quit"
 msgstr "خروج"
 
-#: src/shortcuts_dialog.ui:57 src/window.ui:36
+#: src/shortcuts_dialog.ui:57 src/window.ui:41
 msgid "Keyboard Shortcuts"
 msgstr "میان‌برهای صفحه‌کلید"
 
-#: src/window.py:159
+#: src/shortcuts_dialog.ui:64
+msgid "Navigation"
+msgstr "ناوبری"
+
+#: src/shortcuts_dialog.ui:68
+msgid "Go back"
+msgstr "عقب رفتن"
+
+#: src/shortcuts_dialog.ui:74
+msgid "Switch to Audio"
+msgstr "تغییر به صوت/صدا"
+
+#: src/shortcuts_dialog.ui:80
+msgid "Switch to Video"
+msgstr "تغییر به ویدیو"
+
+#: src/window.py:263
 msgid "Downloading"
 msgstr "در حال بارگیری"
 
-#: src/window.py:161 src/window.py:184
+#: src/window.py:265 src/window.py:288
 msgid "{} of {}"
 msgstr "{} از {}"
 
-#: src/window.py:185 src/window.py:187
+#: src/window.py:289 src/window.py:291
 msgid "unknown"
 msgstr "نامعلوم"
 
-#: src/window.py:253 src/window.ui:424
+#: src/window.py:359 src/window.ui:388
 msgid "Download failed"
 msgstr "بارگیری شکست خورد"
 
-#: src/window.py:257 src/window.ui:529
+#: src/window.py:363 src/window.ui:508
 msgid "Download finished"
 msgstr "بارگیری انجام شد"
 
-#: src/window.py:261 src/window.ui:538
+#: src/window.py:367 src/window.ui:517
 msgid "Open Download Location"
-msgstr ""
+msgstr "باز کردن مکان دانلود"
 
-#: src/window.ui:40
+#: src/window.py:405
+msgid "Reset to Default"
+msgstr "بازگردانی تنظیمات پیش فرض"
+
+#: src/window.py:406 src/window.py:439 src/window.ui:37
+msgid "Change Download Location"
+msgstr "تغییر مکان دانلود"
+
+#: src/window.py:436
+msgid "Invalid folder selected"
+msgstr "پوشه نامعتبری انتخاب شده است"
+
+#: src/window.py:440
+msgid "Select Folder"
+msgstr "انتخاب پوشه"
+
+#: src/window.ui:45
 msgid "About Video Downloader"
-msgstr ""
+msgstr "درباره دانلود کننده ویدیو"
 
-#: src/window.ui:90
+#: src/window.ui:95
+msgid "Main Menu"
+msgstr "فهرست اصلی"
+
+#: src/window.ui:109
 msgid "Audio"
 msgstr "صوت"
 
-#: src/window.ui:123 src/window.ui:198
+#: src/window.ui:131 src/window.ui:182
 msgid "URL"
 msgstr "نشانیِ اینترنتیِ ویدیو"
 
-#: src/window.ui:146 src/window.ui:259
+#: src/window.ui:141 src/window.ui:211
 msgid "Download"
 msgstr "بارگیری"
 
-#: src/window.ui:165
+#: src/window.ui:160
 msgid "Video"
 msgstr "ویدیو"
 
-#: src/window.ui:230
+#: src/window.ui:190
 msgid "Resolution"
 msgstr "وضوح"
 
-#: src/window.ui:395 src/window.ui:499
+#: src/window.ui:198
+msgid "Prefer MPEG format"
+msgstr "ترجیح دادن فرمت MPEG"
+
+#: src/window.ui:340 src/window.ui:359 src/window.ui:460 src/window.ui:479
 msgid "Back"
 msgstr "بازگشت"
 
-#: src/window.ui:443
+#: src/window.ui:407 src/window.ui:534
 msgid "Details"
 msgstr "جزییات"

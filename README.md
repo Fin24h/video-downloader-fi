@@ -1,5 +1,7 @@
 # Video Downloader
 
+[![Translation status](https://hosted.weblate.org/widgets/video-downloader/-/gui/svg-badge.svg)](https://hosted.weblate.org/engage/video-downloader/)
+
 Download videos from websites with an easy-to-use interface.
 Provides the following features:
 
@@ -12,9 +14,17 @@ Based on [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 ## Installation
 
-  * [Flatpak](https://flathub.org/apps/details/com.github.unrud.VideoDownloader)
-  * [Snap](https://snapcraft.io/video-downloader)
+<a href='https://flathub.org/apps/details/com.github.unrud.VideoDownloader'><img width='240' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/></a>
+
+### Alternative installation methods
+
+  * [Snap Store](https://snapcraft.io/video-downloader)
   * [Fedora](https://src.fedoraproject.org/rpms/video-downloader): `sudo dnf install video-downloader`
+  * [Arch User Repository](https://aur.archlinux.org/packages/video-downloader)
+
+## Translation
+
+We're using [Weblate](https://hosted.weblate.org/engage/video-downloader/) to translate the UI. So feel free, to contribute translations over there.
 
 ## Screenshots
 
@@ -27,30 +37,6 @@ Based on [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 ## Hidden configuration options
 
 The behavior of the program can be tweaked with GSettings.
-
-### Download folder
-
-Paths can either be absolute or start with `~`, `xdg-desktop`, `xdg-download`,
-`xdg-templates`, `xdg-publicshare`, `xdg-documents`, `xdg-music`, `xdg-pictures` or `xdg-videos`.
-
-The default is `xdg-download/VideoDownloader`.
-
-#### Flatpak
-
-```
-flatpak run --command=gsettings com.github.unrud.VideoDownloader set com.github.unrud.VideoDownloader download-folder '~/VideoDownloader'
-```
-
-Grant filesystem access to the sandboxed app:
-```
-flatpak override --user --filesystem='~/VideoDownloader:create' com.github.unrud.VideoDownloader
-```
-
-#### Snap
-
-```
-snap run --shell video-downloader -c 'gsettings "$@"' '' set com.github.unrud.VideoDownloader download-folder '~/VideoDownloader'
-```
 
 ### Automatic Subtitles
 
@@ -70,25 +56,8 @@ flatpak run --command=gsettings com.github.unrud.VideoDownloader set com.github.
 snap run --shell video-downloader -c 'gsettings "$@"' '' set com.github.unrud.VideoDownloader automatic-subtitles "['de','en']"
 ```
 
-### Prefer MPEG
-
-Prefer MPEG videos instead of free formats when both are available at the same
-resolution and frame rate.
-
-The default is `false`.
-
-#### Flatpak
-
-```
-flatpak run --command=gsettings com.github.unrud.VideoDownloader set com.github.unrud.VideoDownloader prefer-mpeg true
-```
-
-#### Snap
-
-```
-snap run --shell video-downloader -c 'gsettings "$@"' '' set com.github.unrud.VideoDownloader prefer-mpeg true
-```
-
 ## Debug
 
-To display messages from **yt-dlp** run program with environment variable `G_MESSAGES_DEBUG=yt-dlp`.
+To display messages from **yt-dlp** run program with the environment variable `G_MESSAGES_DEBUG=yt-dlp`.
+
+To display information about GOBject references, start the program with the environment variable `G_MESSAGES_DEBUG=gobject-ref`.

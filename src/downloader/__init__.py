@@ -17,7 +17,7 @@
 
 import contextlib
 import fcntl
-import json
+import functools
 import os
 import re
 import signal
@@ -29,8 +29,14 @@ import typing
 from gi.repository import GLib
 
 from video_downloader.util import g_log
+from video_downloader.util.response import AsyncResponse, Response
+from video_downloader.util.rpc import handle_rpc_request, rpc_response
 
 MAX_RESOLUTION = 2**16-1
+
+# RegEx for splitting lines because `bytes.splitlines` transforms
+# `b'abc\n'` to `[b'abc']` instead of `[b'abc', b'']`
+_SPLITLINES_RE = re.compile(rb'\r\n|\r|\n')
 
 
 class Downloader:
@@ -38,9 +44,7 @@ class Downloader:
         self._handler = handler
         self._process = None
         self._pending_response = None
-        # Use regex to split lines because `bytes.splitlines` transforms
-        # `b'abc\n'` to `[b'abc']` instead of `[b'abc', b'']`
-        self._splitlines_re = re.compile(rb'\r\n|\r|\n')
+        self._cancelled = False
 
     def shutdown(self):
         self._handler = None
@@ -48,24 +52,23 @@ class Downloader:
             self._finish_process_and_kill_pgrp()
 
     def cancel(self):
-        self._process.terminate()
+        if not self._cancelled:
+            self._process.terminate()
+        self._cancelled = True
         if self._pending_response:
-            self._pending_response._finish()
+            self._pending_response.cancel()
 
     def start(self):
         assert not self._process
-        env = os.environ.copy()
-        env['PYTHONPATH'] = os.pathsep.join(filter(None, [
-            os.path.normpath(os.path.join(__file__, *[os.pardir]*3)),
-            env.get('PYTHONPATH')]))
+        extra_env = {'PYTHONPATH': os.pathsep.join(sys.path)}
         # Start child process in its own process group to shield it from
         # signals by terminals (e.g. SIGINT) and to identify remaning children.
         # yt-dlp doesn't kill ffmpeg and other subprocesses on error.
         self._process = subprocess.Popen(
             [sys.executable, '-u', '-m', 'video_downloader.downloader'],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, env=env, universal_newlines=True,
-            preexec_fn=os.setpgrp)
+            stderr=subprocess.PIPE, env={**os.environ, **extra_env},
+            universal_newlines=True, preexec_fn=os.setpgrp)
         # WARNING: O_NONBLOCK can break mult ibyte decoding and line splitting
         # under rare circumstances.
         # E.g. when the buffer only includes the first byte of a multi byte
@@ -89,6 +92,7 @@ class Downloader:
     def _finish_process_and_kill_pgrp(self):
         assert self._process
         process, self._process = self._process, None
+        self._cancelled = False
         try:
             # Terminate process gracefully so it can delete temporary files
             process.terminate()
@@ -102,12 +106,30 @@ class Downloader:
                 os.killpg(process.pid, signal.SIGKILL)
         return process.returncode
 
+    def _pending_response_callback(self, process, request_line, response):
+        assert self._pending_response is response
+        self._pending_response = None
+        if response.cancelled:
+            self.cancel()
+        else:
+            self._send_response(process, request_line, response.result)
+
+    @staticmethod
+    def _send_response(process, request_line, result):
+        try:
+            print(rpc_response(result), file=process.stdin, flush=True)
+        except Exception:
+            g_log(None, GLib.LogLevelFlags.LEVEL_CRITICAL,
+                  'failed request %r\n%s', request_line,
+                  traceback.format_exc())
+            process.terminate()
+
     def _on_process_stdout(self, fd, condition, process):
         # Don't use `process.stdout.read` because of O_NONBLOCK (see `start`)
         s = process.stdout.buffer.read()
         pipe_closed = not s
         process.stdout_remainder += s
-        *lines, process.stdout_remainder = self._splitlines_re.split(
+        *lines, process.stdout_remainder = _SPLITLINES_RE.split(
             process.stdout_remainder)
         if self._process is not process:
             return not pipe_closed
@@ -118,22 +140,19 @@ class Downloader:
                 line = line.decode(process.stdout.encoding)
                 if self._pending_response:
                     raise RuntimeError('request during pending request')
-                request = json.loads(line)
-                method = getattr(self._handler, request['method'])
-                result = method(*request['args'])
+                result = handle_rpc_request(
+                    HandlerInterface, self._handler, line)
             except Exception:
                 g_log(None, GLib.LogLevelFlags.LEVEL_CRITICAL,
                       'failed request %r\n%s', line, traceback.format_exc())
                 failure = True
                 break
-            if isinstance(result, _AsyncResponse):
+            if isinstance(result, AsyncResponse):
                 self._pending_response = result
+                self._pending_response.add_done_callback(functools.partial(
+                    self._pending_response_callback, self._process, line))
             else:
-                self._pending_response = _AsyncResponse()
-            self._pending_response._downloader = self
-            self._pending_response._request_line = line
-            if not isinstance(result, _AsyncResponse):
-                self._pending_response.respond(result)
+                self._send_response(self._process, line, result)
         if pipe_closed and process.stdout_remainder:
             g_log(None, GLib.LogLevelFlags.LEVEL_CRITICAL,
                   'incomplete request %r', process.stdout_remainder)
@@ -141,7 +160,7 @@ class Downloader:
         if pipe_closed or failure:
             returncode = self._finish_process_and_kill_pgrp()
             if self._pending_response:
-                self._pending_response._finish()
+                self._pending_response.cancel()
             self._handler.on_finished(returncode == 0 and not failure)
         return not pipe_closed
 
@@ -152,7 +171,7 @@ class Downloader:
         process.stderr_remainder += s
         if pipe_closed:
             process.stderr_remainder += b'\n'
-        *lines, process.stderr_remainder = self._splitlines_re.split(
+        *lines, process.stderr_remainder = _SPLITLINES_RE.split(
             process.stderr_remainder)
         for line in filter(None, lines):  # Filter empty lines
             # Don't use `errors='strict'` because programs might write garbage
@@ -164,37 +183,7 @@ class Downloader:
         return not pipe_closed
 
 
-_R = typing.TypeVar('R')
-
-
-class _AsyncResponse(typing.Generic[_R]):
-    def __init__(self, done_callback=None):
-        self._done_callback = done_callback
-        self._downloader = None
-        self._request_line = None
-
-    def _finish(self):
-        assert self._downloader and self._downloader._pending_response is self
-        self._downloader._pending_response = None
-        if self._done_callback is not None:
-            self._done_callback()
-
-    def respond(self, result: _R) -> None:
-        try:
-            print(json.dumps({'result': result}),
-                  file=self._downloader._process.stdin, flush=True)
-        except Exception:
-            g_log(None, GLib.LogLevelFlags.LEVEL_CRITICAL,
-                  'failed request %r\n%s', self._request_line,
-                  traceback.format_exc())
-            self._downloader._process.terminate()
-        self._finish()
-
-
-class Handler:
-    AsyncResponse = _AsyncResponse
-    Response = typing.Union[_R, AsyncResponse[_R]]
-
+class HandlerInterface:
     def get_download_dir(self) -> Response[str]:
         raise NotImplementedError
 
@@ -244,7 +233,7 @@ class Handler:
     def on_download_thumbnail(self, thumbnail: str) -> Response[None]:
         raise NotImplementedError
 
-    def on_download_finished(self, filename) -> Response[None]:
+    def on_download_finished(self, filename: str) -> Response[None]:
         raise NotImplementedError
 
     def on_pulse(self) -> Response[None]:

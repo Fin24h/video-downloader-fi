@@ -18,7 +18,6 @@
 import collections
 import gettext
 import os
-import subprocess
 import traceback
 import typing
 
@@ -26,14 +25,16 @@ from gi.repository import Gio, GLib, GObject
 
 from video_downloader import downloader
 from video_downloader.downloader import MAX_RESOLUTION
-from video_downloader.util import (CloseStack, PropertyBinding,
-                                   SignalConnection, expand_path, g_log,
-                                   gobject_log, languages_from_locale)
+from video_downloader.util import g_log, gobject_log, languages_from_locale
+from video_downloader.util.connection import (CloseStack, PropertyBinding,
+                                              SignalConnection)
+from video_downloader.util.path import expand_path, open_in_file_manager
+from video_downloader.util.response import AsyncResponse, Response
 
 N_ = gettext.gettext
 
 
-class Model(GObject.GObject, downloader.Handler):
+class Model(GObject.GObject, downloader.HandlerInterface):
     __gsignals__ = {
         'download-pulse': (GObject.SIGNAL_RUN_FIRST, None, ())
     }
@@ -83,22 +84,9 @@ class Model(GObject.GObject, downloader.Handler):
         self._downloader = downloader.Downloader(self)
         self._cs.add_close_callback(self._downloader.shutdown)
         self._active_download_lock = None
-        self._portal_open_uri_proxy = Gio.DBusProxy.new_for_bus_sync(
-            Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_LOAD_PROPERTIES |
-            Gio.DBusProxyFlags.DO_NOT_CONNECT_SIGNALS |
-            Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION, None,
-            'org.freedesktop.portal.Desktop',
-            '/org/freedesktop/portal/desktop',
-            'org.freedesktop.portal.OpenURI')
-        self._filemanager_proxy = Gio.DBusProxy.new_for_bus_sync(
-            Gio.BusType.SESSION, Gio.DBusProxyFlags.DO_NOT_LOAD_PROPERTIES |
-            Gio.DBusProxyFlags.DO_NOT_CONNECT_SIGNALS |
-            Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION, None,
-            'org.freedesktop.FileManager1', '/org/freedesktop/FileManager1',
-            'org.freedesktop.FileManager1')
         self.actions = gobject_log(Gio.SimpleActionGroup.new())
         for action_name, callback, *extra_args in [
-                ('download', self.set_property, 'state', 'download'),
+                ('download', self.set_property, 'state', 'prepare'),
                 ('cancel', self.set_property, 'state', 'cancel'),
                 ('back', self.set_property, 'state', 'start'),
                 ('open-finished-download-dir',
@@ -125,6 +113,8 @@ class Model(GObject.GObject, downloader.Handler):
     def _state_transition(self, state):
         if state == 'start':
             assert self._prev_state != 'download'
+        elif state == 'prepare':
+            assert self._prev_state == 'start'
             self.error = ''
             self.download_playlist_index = 0
             self.download_playlist_count = 0
@@ -138,9 +128,9 @@ class Model(GObject.GObject, downloader.Handler):
             self.download_eta = -1
             self.finished_download_filenames = []
             self.finished_download_dir = ''
+            self._try_start_download()
         elif state == 'download':
-            assert self._prev_state == 'start'
-            self.finished_download_dir = expand_path(self.download_folder)
+            assert self._prev_state == 'prepare'
             self._downloader.start()
         elif state == 'cancel':
             assert self._prev_state == 'download'
@@ -153,62 +143,25 @@ class Model(GObject.GObject, downloader.Handler):
 
     def _open_finished_download_dir(self):
         assert self.finished_download_dir
+        open_in_file_manager(self.finished_download_dir,
+                             self.finished_download_filenames)
 
-        # org.freedesktop.portal.OpenURI
-        fdlist = Gio.UnixFDList()
-        path = self.finished_download_dir
-        if self.finished_download_filenames:
-            path = os.path.join(path, self.finished_download_filenames[0])
-        try:
-            fd = os.open(path, os.O_RDONLY)
-        except OSError:
-            g_log(None, GLib.LogLevelFlags.LEVEL_WARNING, '%s',
-                  traceback.format_exc())
+    def _try_start_download(self):
+        path = expand_path(self.download_folder)
+        message = check_download_dir(path, create=True)
+        if message is None:
+            self.finished_download_dir = path
+            self.state = 'download'
             return
-        try:
-            handle = fdlist.append(fd)
-        finally:
-            os.close(fd)
-        try:
-            parameters = GLib.Variant('(sha{sv})', ('', handle, {}))
-            self._portal_open_uri_proxy.call_with_unix_fd_list_sync(
-                'OpenDirectory', parameters, Gio.DBusCallFlags.NONE, -1,
-                fdlist)
-        except GLib.Error:
-            g_log(None, GLib.LogLevelFlags.LEVEL_WARNING, '%s',
-                  traceback.format_exc())
-        else:
-            return
+        response = self._handler.on_download_folder_error(
+            N_('Invalid download folder'), message, path)
 
-        # org.freedesktop.FileManager1
-        if self.finished_download_filenames:
-            method = 'ShowItems'
-            paths = [os.path.join(self.finished_download_dir, filename) for
-                     filename in (self.finished_download_filenames or [])]
-            paths = paths[:1]  # Multiple paths open multiple windows
-        else:
-            method = 'ShowFolders'
-            paths = [self.finished_download_dir]
-        parameters = GLib.Variant(
-            '(ass)', ([Gio.File.new_for_path(p).get_uri() for p in paths], ''))
-        try:
-            self._filemanager_proxy.call_sync(
-                method, parameters, Gio.DBusCallFlags.NONE, -1)
-        except GLib.Error:
-            g_log(None, GLib.LogLevelFlags.LEVEL_WARNING, '%s',
-                  traceback.format_exc())
-        else:
-            return
-
-        # xdg-open
-        try:
-            subprocess.run(['xdg-open', self.finished_download_dir],
-                           check=True)
-        except subprocess.SubprocessError:
-            g_log(None, GLib.LogLevelFlags.LEVEL_WARNING, '%s',
-                  traceback.format_exc())
-        else:
-            return
+        def handle_response(response):
+            if response.cancelled:
+                self.state = 'start'
+            else:
+                self._try_start_download()
+        response.add_done_callback(handle_response)
 
     def shutdown(self):
         self._cs.close()
@@ -249,17 +202,27 @@ class Model(GObject.GObject, downloader.Handler):
         assert self.state in ['download', 'cancel']
         return self.resolution
 
+    def _forward_response(self, response):
+        def callback(response):
+            if response.cancelled:
+                self.state = 'cancel'
+        if isinstance(response, AsyncResponse):
+            response.add_done_callback(callback)
+            if self.state == 'cancel':
+                response.cancel()
+        return response
+
     def on_playlist_request(self):
         assert self.state in ['download', 'cancel']
-        return self._handler.on_playlist_request()
+        return self._forward_response(self._handler.on_playlist_request())
 
     def on_login_request(self):
         assert self.state in ['download', 'cancel']
-        return self._handler.on_login_request()
+        return self._forward_response(self._handler.on_login_request())
 
     def on_password_request(self):
         assert self.state in ['download', 'cancel']
-        return self._handler.on_password_request()
+        return self._forward_response(self._handler.on_password_request())
 
     def on_error(self, msg):
         assert self.state in ['download', 'cancel']
@@ -305,10 +268,26 @@ class Model(GObject.GObject, downloader.Handler):
             *(self.finished_download_filenames or []), filename]
 
 
-class Handler:
-    AsyncResponse = downloader.Handler.AsyncResponse
-    Response = downloader.Handler.Response
+def check_download_dir(path: str, create: bool = False
+                       ) -> typing.Optional[str]:
+    if create:
+        try:
+            os.makedirs(path, exist_ok=True)
+        except FileExistsError:
+            return N_('Not a directory')
+        except Exception:
+            g_log(None, GLib.LogLevelFlags.LEVEL_DEBUG,
+                  '%s', traceback.format_exc())
+            return N_('Permission denied')
+    elif not os.path.isdir(path):
+        return N_('Not a directory')
+    if not os.access(path, os.R_OK | os.W_OK | os.X_OK,
+                     effective_ids=os.access in os.supports_effective_ids):
+        return N_('Permission denied')
+    return None
 
+
+class HandlerInterface:
     def on_playlist_request(self) -> Response[bool]:
         raise NotImplementedError
 
@@ -318,4 +297,8 @@ class Handler:
 
     #                                         password
     def on_password_request(self) -> Response[str]:
+        raise NotImplementedError
+
+    def on_download_folder_error(self, title: str, message: str
+                                 ) -> Response[None]:
         raise NotImplementedError

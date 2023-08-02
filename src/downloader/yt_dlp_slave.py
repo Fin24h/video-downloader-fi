@@ -32,6 +32,8 @@ from yt_dlp.postprocessor.ffmpeg import (FFmpegPostProcessor,
                                          FFmpegPostProcessorError)
 from yt_dlp.utils import dfxp2srt, sanitize_filename
 
+from video_downloader.util.path import encode_filesystem_path
+
 # File names are typically limited to 255 bytes
 MAX_OUTPUT_TITLE_LENGTH = 200
 MAX_THUMBNAIL_RESOLUTION = 1024
@@ -44,8 +46,7 @@ def _short_filename(name, length):
             output += '…'
         output = sanitize_filename(output)
         # Check length with file system encoding
-        if (len(output.encode(sys.getfilesystemencoding(), 'ignore'))
-                < length):
+        if len(encode_filesystem_path(output)) < length:
             return output
     raise ValueError('can\'t shorten filename %r to %r bytes' % (name, length))
 
@@ -289,6 +290,10 @@ class YoutubeDLSlave:
             self.ydl_opts['videopassword'] = password
             self._allow_authentication_request = False
             raise RetryException(msg)
+        # Skip unavailable videos
+        if 'Video unavailable.' in msg:
+            self._skipped_count += 1
+            return
         # Ignore missing xattr support
         if 'This filesystem doesn\'t support extended attributes.' in msg:
             return
@@ -426,8 +431,8 @@ class YoutubeDLSlave:
                 temp_download_dir = os.path.join(
                     download_dir, output_title + '.part')
                 try:
-                    os.makedirs(download_dir, exist_ok=True)
-                    os.makedirs(temp_download_dir, exist_ok=True)
+                    with contextlib.suppress(FileExistsError):
+                        os.mkdir(temp_download_dir)
                 except OSError as e:
                     traceback.print_exc(file=sys.stderr)
                     sys.stderr.flush()

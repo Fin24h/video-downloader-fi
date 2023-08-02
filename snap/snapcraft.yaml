@@ -35,30 +35,13 @@ slots:
     name: com.github.unrud.VideoDownloader
 
 parts:
-  libadwaita:
-    plugin: meson
-    source: https://gitlab.gnome.org/GNOME/libadwaita/-/archive/1.2.0/libadwaita-1.2.0.tar.bz2
-    source-checksum: sha256/9da0df3d2f2f5c0a79becd47d09312124542545e4aa1ea151b993c5f6b939e78
-    override-pull: |
-      craftctl default
-      # WORKAROUND: Ignore compiler warning
-      sed -e 's/-W\(format-nonliteral\)\b/-Wno-\1/g' -i meson.build
-    meson-parameters:
-      # WORKAROUND: Must be installed to /usr because of GI search path
-      - --prefix=/usr
-      - -Dexamples=false
-      - -Dtests=false
-      - -Dvapi=false
-    stage:
-      - -usr/include
-
   ffmpeg:
     # WORKAROUND:
     # Build from source because the ffmpeg package installs libraries as dependencies
     # that conflict with the Gnome extension
     plugin: autotools
-    source: https://ffmpeg.org/releases/ffmpeg-5.1.2.tar.xz
-    source-checksum: sha256/619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc
+    source: https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz
+    source-checksum: sha256/57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082
     autotools-configure-parameters:
       # WORKAROUND: Install to /usr instead of /usr/local because it's not in search paths
       - --prefix=/usr
@@ -86,8 +69,8 @@ parts:
     # Missing optional dependencies atomicparsley, mpv, phantomjs and rtmpdump
     after: [ffmpeg]
     plugin: python
-    source: https://github.com/yt-dlp/yt-dlp/releases/download/2022.10.04/yt-dlp.tar.gz
-    source-checksum: sha256/bd3cf6413cd92a400ff015633372a1454906414226f924b57c1f5826b9abc1a8
+    source: https://github.com/yt-dlp/yt-dlp/releases/download/2023.07.06/yt-dlp.tar.gz
+    source-checksum: sha256/6d2115b84b6c11867f92cf4c23705b536bfa0ba9d538b1885f52da6756f8c980
     python-packages:
       - pyxattr==0.7.2
     build-environment:
@@ -112,7 +95,7 @@ parts:
       - -pyvenv.cfg
 
   video-downloader:
-    after: [libadwaita, yt-dlp]
+    after: [ffmpeg, yt-dlp]
     plugin: meson
     source: .
     source-type: git
